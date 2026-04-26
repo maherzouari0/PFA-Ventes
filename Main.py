@@ -2,10 +2,26 @@ import csv
 import os
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-
-# ════════════════════════════════════════════════════════
-#  1. READ CSV — works with ANY size file (Bonus 2)
-# ════════════════════════════════════════════════════════
+def generer_ventes_csv(fichier='ventes.csv'):
+    donnees = [
+        ['ID', 'Prix', 'Quantite', 'Remise'],
+        [101, 15.0, 3, 10],
+        [102, 25.0, 2, 5],
+        [103, 10.0, 5, 0],
+        [104, 50.0, 1, 20],
+        [105, 30.0, 4, 15],
+        [106, 45.0, 3, 10],
+        [107, 20.0, 6, 0],
+        [108, 60.0, 2, 25],
+        [109, 35.0, 4, 5],
+        [110, 80.0, 1, 30],
+    ]
+    
+    with open(fichier, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerows(donnees)
+    
+    print(f"✅ Fichier '{fichier}' généré automatiquement avec {len(donnees)-1} produits.") 
 def lire_ventes(fichier):
     if not os.path.exists(fichier):
         print(f"❌ Erreur : Le fichier '{fichier}' est introuvable.")
@@ -23,12 +39,6 @@ def lire_ventes(fichier):
     print(f"✅ {len(ventes)} produits chargés depuis '{fichier}'")
     return ventes
 
-# ════════════════════════════════════════════════════════
-#  2-4. CALCULATIONS
-#  CA Brut = Prix × Quantite
-#  CA Net  = CA Brut × (1 - Remise/100)
-#  TVA     = CA Net × 20%
-# ════════════════════════════════════════════════════════
 def calculer(ventes):
     for v in ventes:
         v['CA_Brut'] = round(v['Prix'] * v['Quantite'], 2)
@@ -37,9 +47,6 @@ def calculer(ventes):
         v['TTC']     = round(v['CA_Net'] + v['TVA'], 2)
     return ventes
 
-# ════════════════════════════════════════════════════════
-#  5. TOTAL CA
-# ════════════════════════════════════════════════════════
 def ca_total(ventes):
     return round(sum(v['CA_Net'] for v in ventes), 2)
 
@@ -49,16 +56,10 @@ def tva_totale(ventes):
 def ttc_total(ventes):
     return round(sum(v['TTC'] for v in ventes), 2)
 
-# ════════════════════════════════════════════════════════
-#  6. BEST PRODUCT
-# ════════════════════════════════════════════════════════
 def meilleur_produit(ventes):
     best = max(ventes, key=lambda v: v['CA_Net'])
     return best
 
-# ════════════════════════════════════════════════════════
-#  7. EXPORT resultats_final.csv
-# ════════════════════════════════════════════════════════
 def exporter(ventes, fichier):
     colonnes = ['ID','Prix','Quantite','Remise',
                 'CA_Brut','CA_Net','TVA','TTC']
@@ -68,9 +69,6 @@ def exporter(ventes, fichier):
         writer.writerows(ventes)
     print(f"✅ Résultats exportés dans '{fichier}'")
 
-# ════════════════════════════════════════════════════════
-#  BONUS 1 — MATPLOTLIB CHARTS
-# ════════════════════════════════════════════════════════
 def afficher_graphiques(ventes):
     ids     = [str(v['ID'])  for v in ventes]
     ca_brut = [v['CA_Brut']  for v in ventes]
@@ -81,7 +79,6 @@ def afficher_graphiques(ventes):
     fig.suptitle('Analyse des Ventes — PFA Automatisation',
              fontsize=16, fontweight='bold', y=0.98)
 
-    # Chart 1 — CA Brut vs CA Net
     x = range(len(ids))
     width = 0.35
     axes[0].bar([i - width/2 for i in x], ca_brut,
@@ -96,14 +93,12 @@ def afficher_graphiques(ventes):
     axes[0].legend()
     axes[0].grid(axis='y', linestyle='--', alpha=0.5)
 
-    # Chart 2 — TVA par produit
     axes[1].bar(ids, tva, color='mediumseagreen')
     axes[1].set_title('Montant TVA par Produit')
     axes[1].set_xlabel('ID Produit')
     axes[1].set_ylabel('TVA (€)')
     axes[1].grid(axis='y', linestyle='--', alpha=0.5)
 
-    # Chart 3 — Pie chart CA Net distribution
     colors = plt.cm.Set3.colors[:len(ids)]
     axes[2].pie(ca_net, labels=ids, autopct='%1.1f%%',
                 colors=colors, startangle=140)
@@ -114,34 +109,26 @@ def afficher_graphiques(ventes):
     plt.show()
     print("✅ Graphiques sauvegardés dans 'graphique_ca.png'")
 
-# ════════════════════════════════════════════════════════
-#  BONUS 2 — DYNAMIC FILE READING
-# ════════════════════════════════════════════════════════
 def choisir_fichier():
     print("\n📂 Fichier utilisé : 'ventes.csv'")
     return 'ventes.csv'
 
-# ════════════════════════════════════════════════════════
-#  MAIN
-# ════════════════════════════════════════════════════════
 def main():
     print("=" * 55)
     print("   PFA — Automatisation des Ventes")
     print("   Maher Zouari|Nadine Naoui |Amal Guebli")
     print("=" * 55)
 
-    # Bonus 2 — dynamic file reading
+    generer_ventes_csv()
+
     fichier = choisir_fichier()
 
-    # 1. Read
     ventes = lire_ventes(fichier)
     if not ventes:
         return
 
-    # 2-4. Calculate
     ventes = calculer(ventes)
 
-    # 5. Display results
     print("\n─── Résultats par Produit ───────────────────────────")
     print(f"{'ID':<6} {'Prix':>8} {'Qté':>5} {'Remise':>8} "
           f"{'CA Brut':>10} {'CA Net':>10} {'TVA':>8} {'TTC':>10}")
@@ -156,16 +143,13 @@ def main():
     print(f"🧾 TVA Totale     : {tva_totale(ventes):.2f} €")
     print(f"💳 Total TTC      : {ttc_total(ventes):.2f} €")
 
-    # 6. Best product
     best = meilleur_produit(ventes)
     print(f"\n🏆 Meilleur produit : ID {best['ID']} "
           f"avec un CA Net de {best['CA_Net']:.2f} €")
 
-    # 7. Export
     print("\n─── Export ──────────────────────────────────────────")
     exporter(ventes, 'resultats_final.csv')
 
-    # Bonus 1 — charts
     print("\n─── Graphiques ──────────────────────────────────────")
     afficher_graphiques(ventes)
 
