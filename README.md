@@ -1,4 +1,4 @@
-markdown<div align="center">
+<div align="center">
 
 # 🏪 Automatisation des Ventes
 ### Projet de Fin d'Année — Faculté des Sciences de Tunis
